@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{{book.title}}} >> {{{file.title}}}</title>
+  {{#if useLocal}}
+    <link rel="stylesheet" href="/purecss/pure-min.css">
+  {{else}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.2/pure-min.css">
+  {{/if}}
+    <link rel="stylesheet" href="../../mdbook.css">
+</head>
+<body onload='load("{{{book.book}}}", "{{{file.file}}}")'>
+
+<div class="header pure-menu pure-menu-horizontal">
+  <ul id="topBar" class="pure-menu-list">
+    <li id="bookTitle" class="pure-menu-item"></li>
+    <input id="searchQuery" type="text" placeholder="search" size="10" style="border-radius: 5px;">
+    <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+      <a id="me" class="pure-menu-link mt" data-mt="{{#if user}}{{{user}}}{{else}}User{{/if}}"></a>
+      <ul class="pure-menu-children">
+        <li class="pure-menu-item"><a href="../../profile/" class="pure-menu-link mt" data-mt="Profile">Profile</a></li>
+        <li class="pure-menu-item"><a onclick="view()" class="pure-menu-link mt" data-mt="View">View</a></li>
+        <li class="pure-menu-item"><a onclick="edit()" class="pure-menu-link mt" data-mt="Edit">Edit</a></li>
+        <li class="pure-menu-item"><a onclick="save()" class="pure-menu-link mt" data-mt="Save">Save</a></li>
+        <li class="pure-menu-item"><a href="../../view/system/upload.html#book:{{{book.book}}}" class="pure-menu-link mt" data-mt="Upload">Upload</a></li>
+        <li class="pure-menu-item"><a href="../../view/system/createBook.html" class="pure-menu-link mt" data-mt="NewBook">NewBook</a></li>
+        <li class="pure-menu-item"><a href="../../view/system/login.html" class="pure-menu-link mt" data-mt="Login">Login</a></li>
+        <li class="pure-menu-item"><a onclick="logout()" class="pure-menu-link mt" data-mt="Logout">Logout</a></li>
+        <li class="pure-menu-item"><a href="../../view/{{{book.editor}}}/" class="pure-menu-link mt" data-mt="Author">Author</a></li>
+        <li class="pure-menu-item"><a href="../../view/system/" class="pure-menu-link mt" data-mt="System">System</a></li>
+        <li class="pure-menu-item"><a href="/" class="pure-menu-link mt" data-mt="Home">Home</a></li>
+      </ul>
+    </li>    
+    <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+      <a id="locale" class="pure-menu-link mt" data-mt="Global">Global</a>
+      <ul class="pure-menu-children">
+        <li class="pure-menu-item"><a onclick="pageToLocale('')" class="pure-menu-link mt" data-mt="Global">Global</a></li>
+        <li class="pure-menu-item"><a onclick="pageToLocale('en')" class="pure-menu-link">English</a></li>
+        <li class="pure-menu-item"><a onclick="pageToLocale('tw')" class="pure-menu-link">繁體中文</a></li>
+        <li class="pure-menu-item"><a onclick="pageToLocale('cn')" class="pure-menu-link">简体中文</a></li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
+<div id="layout">
+  <a href="#menu" id="menuLink" class="menu-link"><span></span></a>
+  <div id="menu">
+    <div id="sideMenu" class="pure-menu">
+      <a class="pure-menu-heading mt" data-mt="Contents" href="book.mdo">&nbsp;</a>
+      <ul class="pure-menu-list" id="bookBox">
+      </ul>
+    </div>
+  </div>
+
+  <div id="main">
+    <div class="content" id="viewBox"></div>
+    <div class="content" id="editBox" style="display:none">
+      <textarea id="editText" name="editText">{{{file.text}}}</textarea>
+      <textarea id="editBook" name="editBook" style="display:none">{{{book.json}}}</textarea>
+    </div>
+    <div class="content" id="searchBox">
+    </div>
+  </div>
+</div>
+<script src="../../mdbook.js"></script>
+{{#if useLocal}}
+  <script src="../../showdown/showdown.min.js"></script>
+  <script>
+  var highlightCssUrl = '../../katex/katex.min.css'
+  var katexCssUrl = '../../highlight/default.min.css'
+  var katexJsUrl = '../../katex/katex.min.js'
+  var highlightJsUrl = '../../highlight/highlight.min.js'
+  var defaultLocale = '{{book.locale}}'
+  </script>
+{{else}}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.6.0/showdown.min.js"></script>
+  <script>
+  var highlightCssUrl = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/default.min.css'
+  var katexCssUrl = 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.css'
+  var katexJsUrl = 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.js'
+  var highlightJsUrl = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js'
+  var defaultLocale = '{{book.locale}}'
+  </script>
+{{/if}}
+</body>
+</html>
