@@ -233,37 +233,8 @@ function fileRender (text, callback) {
         }
       } catch (err) {}
     })
-    if (!localeChinese()) {
-/*      
-      aslMt(md, function (mdt) {
-        mdRender(mdt, callback)
-      }, false)
-*/      
-      mdRender(md, callback)
-    } else {
-      mdRender(md, callback)
-    }
+    mdRender(md, callback)
   }
-}
-
-function aslMt (source, callback) {
-  ajaxPost('/asl/c2e/', {source: source}, function (r) {
-    var p = JSON.parse(r.responseText)
-    var toTags = []
-    for (var i = 0; i < p.tokens.length; i++) {
-      if (p.tags[i] === '.') {
-        if (p.tokens[i] === '↓') {
-          toTags.push('\n')
-        } else {
-          toTags.push(p.en[i])
-        }
-      } else { // if (/^[a-z]$/.test(p.en[i])){
-        toTags.push(p.en[i] + ' ')
-      }
-//      if (p.cuts[i]) toTags.push('~' + p.tags[i] + '~')
-    }
-    callback(toTags.join('').replace(/_/gi, '-')) // .replace(/~/gi, '_'))
-  }, false)
 }
 
 function codeHighlight () {
@@ -286,7 +257,6 @@ var localeFull = {
 }
 
 // render => fileRender => texRender
-
 function render () {
   fileRender(id('editText').value, function (html) {
     texRender(html, function (texHtml) {
@@ -316,36 +286,6 @@ function save () { // eslint-disable-line
       window.location.href = '../../view/system/login.html'
     }
   })
-}
-
-var searchHtml = ''
-
-function search (key) {
-  ajaxGet('../../search?key=' + key + '', function (status, msg) {
-    var obj = JSON.parse(msg)
-    var results = obj
-    var lines = []
-    for (var i = 0; i < results.length; i++) {
-      lines.push('<h3><a href="../../view/' + results[i].path + '">' + results[i].path + '</a></h3>')
-      var robj = results[i].text || results[i].json
-      var text = JSON.stringify(robj)
-      lines.push('<p>' + text.replace(/\n/gi, '') + '</p>')
-    }
-    id('searchBox').innerHTML = searchHtml = lines.join('\n')
-    showBox('searchBox')
-  })
-}
-
-function logout () { // eslint-disable-line 
-  ajaxPost('../../logout', {}, function (r) {
-    window.location.reload()
-  })
-}
-
-function redirectToSsl () { // eslint-disable-line 
-  if (window.location.href.startsWith('http://')) {
-    window.location.href = window.location.href.replace('http://', 'https://')
-  }
 }
 
 // ====================== MT ====================================
@@ -427,8 +367,39 @@ function mt (msg) {
   return (localeChinese()) ? chineseMt(msg) : msg
 }
 
-// 以下原本寫在 innerHTML 裏，但不 work 所以拉到本 js 檔裏
+// Plugin : 以下原本寫在 innerHTML 裏，但不 work 所以拉到本 js 檔裏
 // http://stackoverflow.com/questions/13390588/script-tag-create-with-innerhtml-of-a-div-doesnt-work
+
+var searchHtml = ''
+
+function search (key) {
+  ajaxGet('../../search?key=' + key + '', function (status, msg) {
+    var obj = JSON.parse(msg)
+    var results = obj
+    var lines = []
+    for (var i = 0; i < results.length; i++) {
+      lines.push('<h3><a href="../../view/' + results[i].path + '">' + results[i].path + '</a></h3>')
+      var robj = results[i].text || results[i].json
+      var text = JSON.stringify(robj)
+      lines.push('<p>' + text.replace(/\n/gi, '') + '</p>')
+    }
+    id('searchBox').innerHTML = searchHtml = lines.join('\n')
+    showBox('searchBox')
+  })
+}
+
+function logout () { // eslint-disable-line 
+  ajaxPost('../../logout', {}, function (r) {
+    window.location.reload()
+  })
+}
+
+function redirectToSsl () { // eslint-disable-line 
+  if (window.location.href.startsWith('http://')) {
+    window.location.href = window.location.href.replace('http://', 'https://')
+  }
+}
+
 function login () {
   var userBox = document.getElementById('user')
   var passwordBox = document.getElementById('password')
