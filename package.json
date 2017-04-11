@@ -1,6 +1,6 @@
 {
   "name": "mdbook",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Markdown Book Editing System",
   "main": "bookServer.js",
   "dependencies": {
