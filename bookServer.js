@@ -1,18 +1,15 @@
-// var http = require('http')
 var fs = require('mz/fs')
 var co = require('co')
 var logger = require('koa-logger')
 var serve = require('koa-static')
-// var route = require('koa-route')
 var cobody = require('co-body')
-var cobusboy = require('co-busboy')
+var asyncBusboy = require('async-busboy')
 var path = require('path')
 var session = require('koa-session')
-var aslk = require('aslk')
-var M = require('./lib/model')
-var V = require('./lib/view')
 var Koa = require('koa')
 var Router = require('koa-router')
+var M = require('./lib/model')
+var V = require('./lib/view')
 
 var app = new Koa()
 var router = new Router()
@@ -31,7 +28,6 @@ var isPass = function (self) {
 
 var parse = async function (self) {
   var json = await cobody(self)
-  // console.log('json=%j', json)
   return (typeof json === 'string') ? JSON.parse(json) : json
 }
 
@@ -62,18 +58,6 @@ var view = async function (ctx, next) { // view(mdFile):convert *.md to html
   } else {
     ctx.type = path.extname(ctx.path)
     ctx.body = fs.createReadStream(M.getFilePath(book, file))
-  }
-}
-
-var asl = async function (ctx, next) {
-  try {
-    var post = await parse(ctx)
-    console.log('asl:post=%j', post)
-    var p = aslk.analyze(post.source, ctx.params.s2t)
-    console.log('asl:p=%j', p)
-    response(ctx, 200, JSON.stringify(p))
-  } catch (e) {
-    response(ctx, 403, e.stack)
   }
 }
 
@@ -116,7 +100,6 @@ var signup = async function (ctx, next) {
 
 var search = async function (ctx, next) {
   try {
-// console.log('ctx.query = %j', ctx.query)
     var key = ctx.query.key || ''
     var q = JSON.parse(ctx.query.q || '{\'type\':\'md\'}')
     var results = await M.search(key, q)
@@ -166,30 +149,16 @@ var createBook = async function (ctx, next) {
   }
 }
 
-var profile = async function (ctx, next) {
-  if (typeof ctx.session.user !== 'undefined') {
-    ctx.redirect('/view/' + ctx.session.user + '/')
-  } else {
-    ctx.redirect('/view/system/error.html')
-  }
-}
-
 var upload = async function (ctx, next) {
-  var part
-  var parts = cobusboy(ctx)
-  var files = []
-  while ((part = await parts)) {
-    if (part instanceof Array) {
-      // console.log('part=%j', part)
-    } else {
-      // console.log('part.filename=%s', part.filename)
-      var stream = fs.createWriteStream(path.join(M.bookRoot, book, part.filename))
-      part.pipe(stream)
-      // console.log('uploading %s -> %s', part.filename, stream.path)
-      files.push(part.filename)
-    }
+  var book = ctx.params.book
+  const {files, fields} = await asyncBusboy(ctx.req)
+  for (var i in files) {
+    var file = files[i].filename
+    console.log('upload file=%s', file)
+    var stream = fs.createWriteStream(path.join(M.bookRoot, book, file))
+    files[i].pipe(stream)
   }
-  ctx.body = files
+  ctx.body = JSON.stringify(files, null, 2)
 }
 
 app.keys = ['#*$*#$)_)*&&^^']
@@ -217,29 +186,11 @@ router
   .post('/login', login)
   .post('/logout', logout)
   .post('/upload/:book', upload)
-  .post('/asl/:s2t', asl)
-
-/*
-  .get('/view/:book/:file', view)
-// app.use(route.get('/locale/:locale', setLocale))
-app.use(route.post('/save/:book/:file', save))
-app.use(route.post('/signup', signup))
-app.use(route.post('/asl', asl))
-app.use(route.get('/createbook/:book', createBook))
-app.use(route.post('/createbook/:book', createBook))
-app.use(route.post('/login', login))
-app.use(route.post('/logout', logout))
-app.use(route.get('/search', search))
-app.use(route.get('/userlist', userList))
-app.use(route.get('/profile', profile))
-app.use(route.post('/upload/:book', upload))
-*/
 
 co(async function () {
   await M.init(__dirname)
   V.init(__dirname)
   var port = M.setting.port || 8080
   app.use(router.routes()).listen(port)
-//   http.createServer(app.callback()).listen(port)
   console.log('http server started: http://localhost:' + port)
 })
