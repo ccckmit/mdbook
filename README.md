@@ -1,4 +1,6 @@
-# Bookdown -- Book Editing System for Markdown
+# MdBook
+
+Book Editing System for Markdown
 
 ## Install
 
