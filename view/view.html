@@ -5,41 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{{book.title}}} >> {{{file.title}}}</title>
   {{#if useLocal}}
-    <link rel="stylesheet" href="/purecss/pure-min.css">
+    <link rel="stylesheet" href="../../purecss/pure-min.css">
   {{else}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.2/pure-min.css">
   {{/if}}
     <link rel="stylesheet" href="../../mdbook.css">
 </head>
-<body onload='load("{{{book.book}}}", "{{{file.file}}}")'>
+<body onload='load()'>
 
 <div class="header pure-menu pure-menu-horizontal">
   <ul id="topBar" class="pure-menu-list">
     <li id="bookTitle" class="pure-menu-item"></li>
-    <input id="searchQuery" type="text" placeholder="search" size="10" style="border-radius: 5px;">
-    <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+    <li id="opMenu" class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
       <a id="me" class="pure-menu-link mt" data-mt="{{#if user}}{{{user}}}{{else}}User{{/if}}"></a>
       <ul class="pure-menu-children">
-        <li class="pure-menu-item"><a href="../../profile/" class="pure-menu-link mt" data-mt="Profile">Profile</a></li>
-        <li class="pure-menu-item"><a onclick="view()" class="pure-menu-link mt" data-mt="View">View</a></li>
-        <li class="pure-menu-item"><a onclick="edit()" class="pure-menu-link mt" data-mt="Edit">Edit</a></li>
-        <li class="pure-menu-item"><a onclick="save()" class="pure-menu-link mt" data-mt="Save">Save</a></li>
-        <li class="pure-menu-item"><a href="../../view/system/upload.html#book:{{{book.book}}}" class="pure-menu-link mt" data-mt="Upload">Upload</a></li>
-        <li class="pure-menu-item"><a href="../../view/system/createBook.html" class="pure-menu-link mt" data-mt="NewBook">NewBook</a></li>
-        <li class="pure-menu-item"><a href="../../view/system/login.html" class="pure-menu-link mt" data-mt="Login">Login</a></li>
-        <li class="pure-menu-item"><a onclick="logout()" class="pure-menu-link mt" data-mt="Logout">Logout</a></li>
-        <li class="pure-menu-item"><a href="../../view/{{{book.editor}}}/" class="pure-menu-link mt" data-mt="Author">Author</a></li>
-        <li class="pure-menu-item"><a href="../../view/system/" class="pure-menu-link mt" data-mt="System">System</a></li>
-        <li class="pure-menu-item"><a href="/" class="pure-menu-link mt" data-mt="Home">Home</a></li>
+        <li class="pure-menu-item"><a href="../../view/{{{user}}}/" class="pure-menu-link mt" data-mt="Profile=私人">Profile</a></li>
+        <li class="pure-menu-item"><a onclick="view()" class="pure-menu-link mt" data-mt="View=檢視">View</a></li>
+        <li class="pure-menu-item"><a onclick="edit()" class="pure-menu-link mt" data-mt="Edit=編輯">Edit</a></li>
+        <li class="pure-menu-item"><a onclick="save()" class="pure-menu-link mt" data-mt="Save=存檔">Save=存檔</a></li>
+        <li class="pure-menu-item"><a onclick="plugin('upload.html')" class="pure-menu-link mt" data-mt="Upload=上傳">Upload</a></li>
+        <li class="pure-menu-item"><a onclick="plugin('createBook.html')" class="pure-menu-link mt" data-mt="NewBook=寫書">NewBook</a></li>
+        <li class="pure-menu-item"><a onclick="plugin('login.html')" class="pure-menu-link mt" data-mt="Login=登入">Login</a></li>
+        <li class="pure-menu-item"><a onclick="logout()" class="pure-menu-link mt" data-mt="Logout=登出">Logout</a></li>
+        <li class="pure-menu-item"><a onclick="plugin('search.html')" class="pure-menu-link mt" data-mt="Search=搜尋">Search</a></li>
+        <li class="pure-menu-item"><a href="../../view/{{{book.editor}}}/" class="pure-menu-link mt" data-mt="Author=作者">Author</a></li>
+        <li class="pure-menu-item"><a href="/" class="pure-menu-link mt" data-mt="Home=首頁">Home</a></li>
       </ul>
-    </li>    
-    <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-      <a id="locale" class="pure-menu-link mt" data-mt="Global">Global</a>
+    </li>
+    <li id="languageMenu" class="pure-menu-item pure-menu-has-children pure-menu-allow-hover" hidden>
+      <a id="locale" class="pure-menu-link">Global</a>
       <ul class="pure-menu-children">
-        <li class="pure-menu-item"><a onclick="pageToLocale('')" class="pure-menu-link mt" data-mt="Global">Global</a></li>
-        <li class="pure-menu-item"><a onclick="pageToLocale('en')" class="pure-menu-link">English</a></li>
-        <li class="pure-menu-item"><a onclick="pageToLocale('tw')" class="pure-menu-link">繁體中文</a></li>
-        <li class="pure-menu-item"><a onclick="pageToLocale('cn')" class="pure-menu-link">简体中文</a></li>
+        <li class="pure-menu-item"><a onclick="render('Global')" class="pure-menu-link">Global</a></li>
+        <li class="pure-menu-item"><a onclick="render('English')" class="pure-menu-link">English</a></li>
+        <li class="pure-menu-item"><a onclick="render('繁體中文')" class="pure-menu-link">繁體中文</a></li>
+        <li class="pure-menu-item"><a onclick="render('简体中文')" class="pure-menu-link">简体中文</a></li>
       </ul>
     </li>
   </ul>
@@ -49,7 +48,7 @@
   <a href="#menu" id="menuLink" class="menu-link"><span></span></a>
   <div id="menu">
     <div id="sideMenu" class="pure-menu">
-      <a class="pure-menu-heading mt" data-mt="Contents" href="book.mdo">&nbsp;</a>
+      <a class="pure-menu-heading mt" data-mt="Contents=內容" href="book.mdo">&nbsp;</a>
       <ul class="pure-menu-list" id="bookBox">
       </ul>
     </div>
@@ -61,29 +60,29 @@
       <textarea id="editText" name="editText">{{{file.text}}}</textarea>
       <textarea id="editBook" name="editBook" style="display:none">{{{book.json}}}</textarea>
     </div>
-    <div class="content" id="searchBox">
-    </div>
+    <div class="content" id="pluginBox"></div>
   </div>
 </div>
 <script src="../../mdbook.js"></script>
-{{#if useLocal}}
-  <script src="../../showdown/showdown.min.js"></script>
-  <script>
-  var highlightCssUrl = '../../katex/katex.min.css'
-  var katexCssUrl = '../../highlight/default.min.css'
-  var katexJsUrl = '../../katex/katex.min.js'
-  var highlightJsUrl = '../../highlight/highlight.min.js'
-  var defaultLocale = '{{book.locale}}'
-  </script>
-{{else}}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.6.0/showdown.min.js"></script>
-  <script>
-  var highlightCssUrl = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/default.min.css'
-  var katexCssUrl = 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.css'
-  var katexJsUrl = 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.js'
-  var highlightJsUrl = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js'
-  var defaultLocale = '{{book.locale}}'
-  </script>
-{{/if}}
+<script>
+setting = {
+  book: '{{{book.book}}}', 
+  file: '{{{file.file}}}',
+  defaultLocale: '{{book.locale}}',
+ {{#if useLocal}}
+  showdownJsUrl:'../../showdown/showdown.min.js',
+  highlightCssUrl: '../../katex/katex.min.css',
+  katexCssUrl: '../../highlight/default.min.css',
+  katexJsUrl: '../../katex/katex.min.js',
+  highlightJsUrl: '../../highlight/highlight.min.js',
+ {{else}}
+  showdownJsUrl: 'https://cdnjs.cloudflare.com/ajax/libs/showdown/1.6.0/showdown.min.js',
+  highlightCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/default.min.css',
+  katexCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.css',
+  katexJsUrl: 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.js',
+  highlightJsUrl: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js',
+ {{/if}}
+}
+</script>
 </body>
 </html>

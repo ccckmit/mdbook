@@ -1,15 +1,16 @@
 var fs = require('mz/fs')
 var co = require('co')
 var logger = require('koa-logger')
-var serve = require('koa-static')
+var koaStatic = require('koa-static')
 var cobody = require('co-body')
 var asyncBusboy = require('async-busboy')
 var path = require('path')
 var session = require('koa-session')
-var Koa = require('koa')
-var Router = require('koa-router')
+var aslk = require('aslk')
 var M = require('./lib/model')
 var V = require('./lib/view')
+var Koa = require('koa')
+var Router = require('koa-router')
 
 var app = new Koa()
 var router = new Router()
@@ -61,6 +62,16 @@ var view = async function (ctx, next) { // view(mdFile):convert *.md to html
   }
 }
 
+var mt = async function (ctx, next) {
+  try {
+    var post = await parse(ctx)
+    var p = aslk.analyze(post.source, ctx.params.s2t)
+    response(ctx, 200, JSON.stringify({s: p.s, t: p.t, cuts: p.cuts, tags: p.tags}))
+  } catch (e) {
+    response(ctx, 403, e.stack)
+  }
+}
+
 var save = async function (ctx, next) { // save markdown file.
   var book = ctx.params.book
   var file = ctx.params.file
@@ -100,23 +111,15 @@ var signup = async function (ctx, next) {
 
 var search = async function (ctx, next) {
   try {
+    console.log('search:ctx.query=%j', ctx.query)
     var key = ctx.query.key || ''
-    var q = JSON.parse(ctx.query.q || '{\'type\':\'md\'}')
+    var q = JSON.parse(ctx.query.q || '{"type":"md"}')
+    console.log('search:key=%s q=%j', key, q)
     var results = await M.search(key, q)
     response(ctx, 200, JSON.stringify(results))
   } catch (e) {
-    response(ctx, 403, e.stack)
+    response(ctx, 403, JSON.stringify(e.stack))
   }
-}
-
-
-var userList = async function (ctx, next) {
-  var lines = ['<ol>']
-  for (var user in M.users) {
-    lines.push(' <li><a href=\'/view/book/' + user + '/README.md\'>' + user + '</a></li>')
-  }
-  lines.push('</ol>')
-  response(ctx, 200, lines.join('\n'))
 }
 
 var login = async function (ctx, next) {
@@ -151,7 +154,7 @@ var createBook = async function (ctx, next) {
 
 var upload = async function (ctx, next) {
   var book = ctx.params.book
-  const {files, fields} = await asyncBusboy(ctx.req)
+  const {files} = await asyncBusboy(ctx.req)
   for (var i in files) {
     var file = files[i].filename
     console.log('upload file=%s', file)
@@ -173,19 +176,23 @@ var CONFIG = {
 
 app.use(logger())
 app.use(session(CONFIG, app))
-app.use(serve(path.join(__dirname, 'web')))
-app.use(serve(path.join(__dirname, 'user')))
+app.use(koaStatic(path.join(__dirname, 'web')))
+app.use(koaStatic(path.join(__dirname, 'user')))
 
 router
   .get('/', function (ctx, next) {
     console.log('ctx=%j', ctx)
     ctx.redirect(M.setting.home)
   })
+  .get('/search', search)
   .get('/view/:book/:file?', view)
+  .get('/createbook/:book', createBook)
   .post('/save/:book/:file', save)
   .post('/login', login)
   .post('/logout', logout)
+  .post('/signup', signup)
   .post('/upload/:book', upload)
+  .post('/mt/:s2t', mt)
 
 co(async function () {
   await M.init(__dirname)
@@ -194,3 +201,28 @@ co(async function () {
   app.use(router.routes()).listen(port)
   console.log('http server started: http://localhost:' + port)
 })
+
+/*
+var profile = async function (ctx, next) {
+  if (typeof ctx.session.user !== 'undefined') {
+    ctx.redirect('/view/' + ctx.session.user + '/')
+  } else {
+    ctx.redirect('/view/system/error.html')
+  }
+}
+
+var userList = async function (ctx, next) {
+  var lines = ['<ol>']
+  for (var user in M.users) {
+    lines.push(' <li><a href=\'/view/book/' + user + '/README.md\'>' + user + '</a></li>')
+  }
+  lines.push('</ol>')
+  response(ctx, 200, lines.join('\n'))
+}
+*/
+/*
+var plugin = async function (ctx, next) {
+  var file = ctx.params.file
+  ctx.body = fs.createReadStream(path.join(__dirname, '/plugin/', file))
+}
+*/

@@ -1,3 +1,14 @@
+#watch  { 
+  overflow:auto; margin:10px; padding:10px; width:95%; height:10vh; 
+  display:"inline"; border:dotted #336699 1px; line-height:300%;
+}
+
+#watch .cut { color:#9f9f9f; position: relative; top: 1em; left: -1em; font-size: 0.8em;}
+
+ruby { color:#3f3f3f; }
+rt { font-size:1em; color:#336699; padding:10px 0 10px 0; letter-spacing: 0px;  };
+.tag { color:#bb66aa; position: relative; top: 1em; left: -1em; font-size: 0.8em;}
+
 .fileUpload {
     position: relative;
     overflow: hidden;
@@ -71,7 +82,7 @@ a {
 
 textarea {
   width:100%;
-  height:80vh; // 80vh : 80% view port hieght
+  height:70vh; // 80vh : 80% view port hieght
   margin:10px;
   font-family:MingLiU, monospace; // MingLiU 細明體; Monospace; http://eeepage.info/css-font-family/
 //  font-weight:bold;

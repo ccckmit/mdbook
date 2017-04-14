@@ -3,9 +3,9 @@ portSsl:443
 home:/index.html
 signup:false
 useLocal:false
-db:{user:"ccc", password:"ccc1234", port:27017}
+db:{user:"ccc", password:"ccc371461", port:27017}
 users:
 user     | password 
 ---------|-----------
-system   | system1234
-ccc      | ccc1234
+system   | ccc371461
+ccc      | ccc371461
